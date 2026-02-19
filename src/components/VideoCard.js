@@ -14,7 +14,9 @@ const VideoCard = ({ info }) => {
 export const AdsVideoCard = ({ info }) => {
   return (
     <div className="border border-red-500 p-2 m-2">
-      <span className="absolute bg-gray-600 px-2 m-2 text-white rounded-lg ">ads</span>
+      <span className="absolute bg-gray-600 px-2 m-2 text-white rounded-lg ">
+        ads
+      </span>
       <VideoCard info={info} />
     </div>
   );

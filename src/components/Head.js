@@ -1,10 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
+import { YOUTUBE_SEARCH_API } from "../utils/constant";
 const Head = () => {
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
-  console.log(searchQuery);
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => getListOfSearchResults(), 200);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const getListOfSearchResults = async () => {
+    console.log(searchQuery);
+    const response = await fetch(YOUTUBE_SEARCH_API + searchQuery);
+
+    console.log(response, "response");
+    const json = await response.json();
+    setSearchResults(json.items);
+    console.log(json.items);
+  };
 
   const handleToggleMenu = () => {
     dispatch(toggleMenu());
@@ -34,23 +51,29 @@ const Head = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setShowSearchResults(true)}
+            onBlur={() => setShowSearchResults(false)}
           />
           <button className="border border-gray-400 py-2 px-5 bg-gray-100 rounded-r-full">
             🔍
           </button>
         </div>
-        <div className="absolute bg-white py-3 px-5 w-[37rem]">
-          <ul>
-            <li>🔍 demo</li>
-            <li>🔍 demo</li>
-            <li>🔍 demo</li>
-            <li>🔍 demo</li>
-            <li>🔍 demo</li>
-            <li>🔍 demo</li>
-            <li>🔍 demo</li>
-            <li>🔍 demo</li>
-          </ul>
-        </div>
+        {showSearchResults && (
+          <div className="absolute  bg-white w-[37rem] rounded-lg shadow-lg border border-gray-200 z-50">
+            <ul className="max-h-80 overflow-y-auto">
+              {searchResults.map((result) => (
+                <li
+                  key={result.id.videoId}
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                  onClick={() => setSearchQuery(result.snippet.title)}
+                >
+                  <span className="text-gray-500">🔍</span>
+                  <span className="line-clamp-1">{result?.snippet?.title}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="grid-cols-1">
         <img
